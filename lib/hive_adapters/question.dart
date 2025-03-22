@@ -1,21 +1,17 @@
 import 'package:hive/hive.dart';
 
-part 'question.g.dart'; // This line is important for code generation
+part 'question.g.dart';
 
-@HiveType(typeId: 0) // typeId must be unique for each model
+@HiveType(typeId: 0)
 class Question {
   @HiveField(0)
   final String question;
 
   @HiveField(1)
-  final List<String> options;
-
-  @HiveField(2)
-  final int correctAnswerIndex;
+  String? answer; // Make answer nullable
 
   Question({
     required this.question,
-    required this.options,
-    required this.correctAnswerIndex,
+    this.answer, // Answer is optional in the constructor
   });
 }

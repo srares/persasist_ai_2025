@@ -11,7 +11,7 @@ class _QuizPageState extends State<QuizPage> {
   List<Question> questions = [];
   int currentQuestionIndex = 0;
   int score = 0;
-  List<int?> selectedAnswers = [];
+  List<String?> givenAnswers = []; // Store user's answers as strings
 
   @override
   void initState() {
@@ -23,7 +23,8 @@ class _QuizPageState extends State<QuizPage> {
     var box = Hive.box<Question>('questions');
     setState(() {
       questions = box.values.toList();
-      selectedAnswers = List.filled(questions.length, null);
+      givenAnswers =
+          List.filled(questions.length, null); // Initialize with nulls
     });
   }
 
@@ -33,38 +34,33 @@ class _QuizPageState extends State<QuizPage> {
         currentQuestionIndex++;
       });
     } else {
-      calculateScore();
+      // All questions answered, now save answers to the questions
+      saveAnswersToQuestions();
+      sendQuestionsToAiStudio();
     }
   }
 
-  void calculateScore() {
-    int totalScore = 0;
+  void saveAnswersToQuestions() {
+    var box = Hive.box<Question>('questions');
     for (int i = 0; i < questions.length; i++) {
-      if (selectedAnswers[i] == questions[i].correctAnswerIndex) {
-        totalScore++;
-      }
+      questions[i].answer = givenAnswers[i];
+      box.putAt(i, questions[i]); // Use putAt with the index
     }
-    setState(() {
-      score = totalScore;
-    });
-    showScoreDialog();
   }
 
-  void showScoreDialog() {
-    String level;
-    if (score <= 5) {
-      level = "Începător";
-    } else if (score <= 10) {
-      level = "Intermediar";
-    } else {
-      level = "Avansat";
-    }
-
+  void sendQuestionsToAiStudio() {
+    // Here you would implement the logic to send the questions and answers to AI Studio
+    // For example, you might make an HTTP request to an API endpoint.
+    // You can access the questions and answers like this:
+    // for (var question in questions) {
+    //   print("Question: ${question.question}, Answer: ${question.answer}");
+    // }
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text("Scor final: $score / ${questions.length}"),
-        content: Text("Nivelul tău: $level"),
+        title: const Text("Întrebările au fost trimise"),
+        content: const Text(
+            "Întrebările și răspunsurile au fost trimise către AI Studio."),
         actions: [
           TextButton(
             onPressed: () {
@@ -82,7 +78,7 @@ class _QuizPageState extends State<QuizPage> {
     setState(() {
       currentQuestionIndex = 0;
       score = 0;
-      selectedAnswers = List.filled(questions.length, null);
+      givenAnswers = List.filled(questions.length, null);
     });
   }
 
@@ -114,29 +110,27 @@ class _QuizPageState extends State<QuizPage> {
               style: const TextStyle(fontSize: 20),
             ),
             const SizedBox(height: 20),
-            Column(
-              children: List.generate(
-                currentQuestion.options.length,
-                (index) => RadioListTile<int>(
-                  title: Text(currentQuestion.options[index]),
-                  value: index,
-                  groupValue: selectedAnswers[currentQuestionIndex],
-                  onChanged: (value) {
-                    setState(() {
-                      selectedAnswers[currentQuestionIndex] = value;
-                    });
-                  },
-                ),
+            // Text input for the answer
+            TextField(
+              onChanged: (value) {
+                setState(() {
+                  givenAnswers[currentQuestionIndex] = value;
+                });
+              },
+              decoration: const InputDecoration(
+                hintText: "Scrie răspunsul aici...",
+                border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: selectedAnswers[currentQuestionIndex] == null
+              onPressed: givenAnswers[currentQuestionIndex] == null ||
+                      givenAnswers[currentQuestionIndex]!.isEmpty
                   ? null
                   : nextQuestion,
               child: Text(
                 currentQuestionIndex == questions.length - 1
-                    ? "Finalizează Testul"
+                    ? "Trimite la AI Studio"
                     : "Următoarea întrebare",
               ),
             ),
