@@ -60,7 +60,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'AI Mentor',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: QuizPage(),
+      home: OnboardingPage(),
     );
   }
 }
