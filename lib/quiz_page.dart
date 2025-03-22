@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
+import 'package:personal_ai_assistant/hive_adapters/module.dart';
 import 'package:personal_ai_assistant/hive_adapters/question.dart';
 import 'package:personal_ai_assistant/hive_adapters/result.dart'; // Import the Result model
+import 'package:personal_ai_assistant/modules_page.dart';
 import 'package:personal_ai_assistant/services/api_service.dart';
 import 'package:personal_ai_assistant/widgets/common_widgets.dart';
 
@@ -19,6 +21,7 @@ class _QuizPageState extends State<QuizPage> {
 
   final TextEditingController answerController = TextEditingController();
   final ApiService apiService = ApiService(); // Initialize the API service
+  Result? savedResult; // Add a variable to store the saved result
 
   @override
   void initState() {
@@ -63,17 +66,17 @@ class _QuizPageState extends State<QuizPage> {
       final int score = result['score'];
       final String level = result['level'];
 
-      // Save the result to Hive
       var resultsBox = Hive.box<Result>('results');
-      resultsBox.clear(); // Clear previous results
+      resultsBox.clear();
       resultsBox.add(Result(score: score, level: level));
 
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text("Rezultatul Testului"),
-          // content: Text(
-          //     "Ai obținut un scor de: $score / 100\nNivelul tău de cunoștine este: $level"),
+          title: const Text(
+            "Rezultatul Testului",
+            textAlign: TextAlign.center,
+          ),
           content: SizedBox(
             width: MediaQuery.of(context).size.width * 0.8,
             height: MediaQuery.of(context).size.height * 0.15,
@@ -111,9 +114,10 @@ class _QuizPageState extends State<QuizPage> {
                     backgroundColor:
                         WidgetStateProperty.all<Color>(Colors.green[200]!),
                   ),
-                  onPressed: () {
-                    // Navigator.of(context).pop();
-                    // restartQuiz();
+                  onPressed: () async {
+                    // Stochează contextul original
+                    Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => ModulesPage()));
                   },
                   child: const Text("Am înțeles"),
                 ),
@@ -147,13 +151,15 @@ class _QuizPageState extends State<QuizPage> {
     });
   }
 
-  Result? savedResult; // Add a variable to store the saved result
-
   void loadResult() {
     var resultsBox = Hive.box<Result>('results');
     if (resultsBox.isNotEmpty) {
       setState(() {
         savedResult = resultsBox.getAt(0); // Get the first result
+      });
+    } else {
+      setState(() {
+        savedResult = null; // Set savedResult to null if the box is empty
       });
     }
   }
@@ -178,15 +184,6 @@ class _QuizPageState extends State<QuizPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (savedResult != null) // Show the result if it exists
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 16.0),
-                  child: Text(
-                    "Scorul tău: ${savedResult!.score} / 100\nNivelul tău: ${savedResult!.level}",
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
               Text(
                 "Întrebarea ${currentQuestionIndex + 1}/${questions.length}",
                 style:

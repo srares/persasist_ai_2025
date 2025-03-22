@@ -8,10 +8,10 @@ class Question {
   final String question;
 
   @HiveField(1)
-  String? answer; // Make answer nullable
+  String? answer;
 
   Question({
     required this.question,
-    this.answer, // Answer is optional in the constructor
+    this.answer,
   });
 }

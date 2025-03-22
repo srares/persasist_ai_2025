@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:personal_ai_assistant/hive_adapters/module.dart';
 import 'package:personal_ai_assistant/hive_adapters/question.dart';
 import 'package:personal_ai_assistant/hive_adapters/result.dart';
 import 'quiz_page.dart';
@@ -9,13 +10,18 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(QuestionAdapter());
   Hive.registerAdapter(ResultAdapter());
+  Hive.registerAdapter(ModuleAdapter()); // Register the ModuleAdapter
+
+  await Hive.openBox<Module>('modules');
   await Hive.openBox<Question>('questions');
   await Hive.openBox<Result>('results'); // Open the results box
 
   // Example of adding questions to the box
   var box = Hive.box<Question>('questions');
 
+// -------------------clear box when testing local when change questions ------------------------
   // box.clear();
+// -------------------clear box when testing local when change questions-------------------------
   if (box.isEmpty) {
     // Nivel Începător
     box.add(Question(question: "Ce este AI-ul?"));
