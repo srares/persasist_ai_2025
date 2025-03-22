@@ -4,6 +4,7 @@ import 'package:personal_ai_assistant/hive_adapters/module.dart';
 import 'package:personal_ai_assistant/hive_adapters/question.dart';
 import 'package:personal_ai_assistant/hive_adapters/result.dart';
 import 'quiz_page.dart';
+import 'OnboardingPage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -65,7 +66,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'AI Mentor',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: QuizPage(),
+      home: OnboardingPage(),
     );
   }
 }
