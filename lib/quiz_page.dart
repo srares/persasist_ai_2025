@@ -115,7 +115,8 @@ class _QuizPageState extends State<QuizPage> {
                         WidgetStateProperty.all<Color>(Colors.green[200]!),
                   ),
                   onPressed: () async {
-                    // Stochează contextul original
+                    await apiService.generateStudyModules(
+                        level, questions); // Stochează contextul original
                     Navigator.of(context).push(
                         MaterialPageRoute(builder: (context) => ModulesPage()));
                   },

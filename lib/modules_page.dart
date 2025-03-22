@@ -20,11 +20,6 @@ class _ModulesPageState extends State<ModulesPage> {
 
   Future<void> loadModules() async {
     try {
-      // Make sure the box is open
-      if (!Hive.isBoxOpen('modules')) {
-        await Hive.openBox<Module>('modules');
-      }
-
       var modulesBox = Hive.box<Module>('modules');
       debugPrint("Number of modules in box: ${modulesBox.length}");
 

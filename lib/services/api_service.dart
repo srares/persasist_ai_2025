@@ -275,7 +275,7 @@ class ApiService {
       }
 
       var modulesBox = Hive.box<Module>('modules');
-      modulesBox.clear(); // Clear previous modules
+      // modulesBox.clear(); // Clear previous modules
 
       // Add each module to the box
       for (var module in modules) {

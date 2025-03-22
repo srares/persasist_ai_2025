@@ -3,7 +3,6 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:personal_ai_assistant/hive_adapters/module.dart';
 import 'package:personal_ai_assistant/hive_adapters/question.dart';
 import 'package:personal_ai_assistant/hive_adapters/result.dart';
-import 'quiz_page.dart';
 import 'OnboardingPage.dart';
 
 void main() async {
