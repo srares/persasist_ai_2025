@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:personal_ai_assistant/hive_adapters/question.dart';
+import 'package:personal_ai_assistant/services/api_service.dart';
 import 'package:personal_ai_assistant/widgets/common_widgets.dart';
 
 class QuizPage extends StatefulWidget {
@@ -16,6 +17,7 @@ class _QuizPageState extends State<QuizPage> {
   List<String?> givenAnswers = []; // Store user's answers as strings
 
   final TextEditingController answerController = TextEditingController();
+  final ApiService apiService = ApiService(); // Initialize the API service
 
   @override
   void initState() {
@@ -53,30 +55,43 @@ class _QuizPageState extends State<QuizPage> {
     }
   }
 
-  void sendQuestionsToAiStudio() {
-    // Here you would implement the logic to send the questions and answers to AI Studio
-    // For example, you might make an HTTP request to an API endpoint.
-    // You can access the questions and answers like this:
-    // for (var question in questions) {
-    //   print("Question: ${question.question}, Answer: ${question.answer}");
-    // }
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Întrebările au fost trimise"),
-        content: const Text(
-            "Întrebările și răspunsurile au fost trimise către AI Studio."),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              restartQuiz();
-            },
-            child: const Text("Reîncearcă"),
-          ),
-        ],
-      ),
-    );
+  void sendQuestionsToAiStudio() async {
+    try {
+      final result = await apiService.sendQuestionsAndAnswers(questions);
+      final int score = result['score'];
+      final String level = result['level'];
+
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Rezultatul Testului"),
+          content: Text("Scor: $score / 100\nNivel: $level"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                restartQuiz();
+              },
+              child: const Text("Reîncearcă"),
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Eroare"),
+          content: Text("A apărut o eroare: $e"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   void restartQuiz() {
