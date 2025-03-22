@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Test AI',
+      title: 'AI Mentor',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: QuizPage(),
     );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:personal_ai_assistant/hive_adapters/question.dart';
+import 'package:personal_ai_assistant/widgets/common_widgets.dart';
 
 class QuizPage extends StatefulWidget {
   @override
@@ -99,11 +100,7 @@ class _QuizPageState extends State<QuizPage> {
     dynamic width = MediaQuery.of(context).size.width;
     dynamic height = MediaQuery.of(context).size.height;
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: const Text("Test AI"),
-        backgroundColor: Colors.blue[200],
-      ),
+      appBar: CustomAppBar(title: "AI Mentor"),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -142,10 +139,11 @@ class _QuizPageState extends State<QuizPage> {
                 ),
                 child: Center(
                   child: Text(
+                    textAlign: TextAlign.center,
                     currentQuestion.question,
                     style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 22,
+                        fontSize: 25,
                         fontWeight: FontWeight.bold),
                   ),
                 ),
