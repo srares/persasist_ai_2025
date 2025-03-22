@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:personal_ai_assistant/hive_adapters/question.dart';
+import 'package:personal_ai_assistant/hive_adapters/result.dart';
 import 'quiz_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   Hive.registerAdapter(QuestionAdapter());
+  Hive.registerAdapter(ResultAdapter());
   await Hive.openBox<Question>('questions');
+  await Hive.openBox<Result>('results'); // Open the results box
 
   // Example of adding questions to the box
   var box = Hive.box<Question>('questions');
+
   // box.clear();
   if (box.isEmpty) {
     // Nivel Începător
