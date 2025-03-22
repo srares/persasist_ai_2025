@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:personal_ai_assistant/hive_adapters/question.dart';
 
@@ -12,6 +13,8 @@ class _QuizPageState extends State<QuizPage> {
   int currentQuestionIndex = 0;
   int score = 0;
   List<String?> givenAnswers = []; // Store user's answers as strings
+
+  final TextEditingController answerController = TextEditingController();
 
   @override
   void initState() {
@@ -30,6 +33,7 @@ class _QuizPageState extends State<QuizPage> {
 
   void nextQuestion() {
     if (currentQuestionIndex < questions.length - 1) {
+      answerController.clear();
       setState(() {
         currentQuestionIndex++;
       });
@@ -92,49 +96,88 @@ class _QuizPageState extends State<QuizPage> {
     }
 
     Question currentQuestion = questions[currentQuestionIndex];
-
+    dynamic width = MediaQuery.of(context).size.width;
+    dynamic height = MediaQuery.of(context).size.height;
     return Scaffold(
-      appBar: AppBar(title: const Text("Test AI")),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Întrebarea ${currentQuestionIndex + 1}/${questions.length}",
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              currentQuestion.question,
-              style: const TextStyle(fontSize: 20),
-            ),
-            const SizedBox(height: 20),
-            // Text input for the answer
-            TextField(
-              onChanged: (value) {
-                setState(() {
-                  givenAnswers[currentQuestionIndex] = value;
-                });
-              },
-              decoration: const InputDecoration(
-                hintText: "Scrie răspunsul aici...",
-                border: OutlineInputBorder(),
+      appBar: AppBar(
+        centerTitle: true,
+        title: const Text("Test AI"),
+        backgroundColor: Colors.blue[200],
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Întrebarea ${currentQuestionIndex + 1}/${questions.length}",
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: givenAnswers[currentQuestionIndex] == null ||
-                      givenAnswers[currentQuestionIndex]!.isEmpty
-                  ? null
-                  : nextQuestion,
-              child: Text(
-                currentQuestionIndex == questions.length - 1
-                    ? "Trimite la AI Studio"
-                    : "Următoarea întrebare",
+              SizedBox(height: height * 0.02),
+              Container(
+                padding: EdgeInsets.symmetric(
+                    vertical: height * 0.1, horizontal: 10),
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xff205781),
+                      Color(0xff4F959D),
+                      Color(0xff98D2C0),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  // border: Border.all(color: Colors.blue),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Center(
+                  child: Text(
+                    currentQuestion.question,
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+              // Text input for the answer
+              TextField(
+                controller: answerController,
+                onChanged: (value) {
+                  setState(() {
+                    givenAnswers[currentQuestionIndex] = value;
+                  });
+                },
+                decoration: const InputDecoration(
+                  hintText: "Scrie răspunsul aici...",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: givenAnswers[currentQuestionIndex] == null ||
+                        givenAnswers[currentQuestionIndex]!.isEmpty
+                    ? null
+                    : nextQuestion,
+                child: Text(
+                  currentQuestionIndex == questions.length - 1
+                      ? "Trimite la AI Studio"
+                      : "Următoarea întrebare",
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
