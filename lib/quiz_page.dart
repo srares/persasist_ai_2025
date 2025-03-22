@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:personal_ai_assistant/hive_adapters/question.dart';
+import 'package:personal_ai_assistant/hive_adapters/result.dart'; // Import the Result model
 import 'package:personal_ai_assistant/services/api_service.dart';
 import 'package:personal_ai_assistant/widgets/common_widgets.dart';
 
@@ -23,6 +24,7 @@ class _QuizPageState extends State<QuizPage> {
   void initState() {
     super.initState();
     loadQuestions();
+    loadResult(); // Load the result when the page initializes
   }
 
   void loadQuestions() {
@@ -61,19 +63,62 @@ class _QuizPageState extends State<QuizPage> {
       final int score = result['score'];
       final String level = result['level'];
 
+      // Save the result to Hive
+      var resultsBox = Hive.box<Result>('results');
+      resultsBox.clear(); // Clear previous results
+      resultsBox.add(Result(score: score, level: level));
+
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
           title: const Text("Rezultatul Testului"),
-          content: Text("Scor: $score / 100\nNivel: $level"),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                restartQuiz();
-              },
-              child: const Text("Reîncearcă"),
+          // content: Text(
+          //     "Ai obținut un scor de: $score / 100\nNivelul tău de cunoștine este: $level"),
+          content: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.8,
+            height: MediaQuery.of(context).size.height * 0.15,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Ai obținut un scor de: $score / 100",
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold)),
+                Text("Nivelul tău de cunoștine este: $level",
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    )),
+              ],
             ),
+          ),
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor:
+                        WidgetStateProperty.all<Color>(Colors.red[200]!),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    restartQuiz();
+                  },
+                  child: const Text("Reîncearcă"),
+                ),
+                ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor:
+                        WidgetStateProperty.all<Color>(Colors.green[200]!),
+                  ),
+                  onPressed: () {
+                    // Navigator.of(context).pop();
+                    // restartQuiz();
+                  },
+                  child: const Text("Am înțeles"),
+                ),
+              ],
+            )
           ],
         ),
       );
@@ -102,6 +147,17 @@ class _QuizPageState extends State<QuizPage> {
     });
   }
 
+  Result? savedResult; // Add a variable to store the saved result
+
+  void loadResult() {
+    var resultsBox = Hive.box<Result>('results');
+    if (resultsBox.isNotEmpty) {
+      setState(() {
+        savedResult = resultsBox.getAt(0); // Get the first result
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (questions.isEmpty) {
@@ -122,6 +178,15 @@ class _QuizPageState extends State<QuizPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              if (savedResult != null) // Show the result if it exists
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: Text(
+                    "Scorul tău: ${savedResult!.score} / 100\nNivelul tău: ${savedResult!.level}",
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
               Text(
                 "Întrebarea ${currentQuestionIndex + 1}/${questions.length}",
                 style:
