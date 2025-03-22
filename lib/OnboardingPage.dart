@@ -13,7 +13,7 @@ class OnboardingPage extends StatelessWidget {
             children: <Widget>[
               // Imaginea
               Image.asset(
-                'images/onboarding_image.jpg',
+                '../images/onboarding_image.jpg',
                 height: 200,
               ),
               const SizedBox(height: 20),
@@ -63,3 +63,4 @@ class OnboardingPage extends StatelessWidget {
       ),
     );
   }
+}
