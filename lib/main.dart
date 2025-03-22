@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:personal_ai_assistant/hive_adapters/question.dart';
 import 'quiz_page.dart';
+import 'OnboardingPage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
